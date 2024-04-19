@@ -51,5 +51,12 @@ contract Coin is IERC20 {
         return true;
     }
 
-    
+    function approve(address _spender, uint256 _value) public returns (bool) {
+        require(_spender != address(0), "_spender is an invalid address");
+        require(allowance[msg.sender][_spender] == 0 || _value == 0, '_spender already has an allowance. Set to 0 before assigning new value.');
+        require(_value <= balanceOf[msg.sender], 'Not enough balance');
+        allowance[msg.sender][_spender] = _value;
+        emit Approval(msg.sender, _spender, _value);
+    }
+
 }
