@@ -11,8 +11,8 @@ contract Coin is IERC20 {
     uint256 public price;
     address public systemContract;
 
-    mapping (address => uint256) internal balanceOf;
-    mapping (address => mapping (address => uint256)) internal allowance;
+    mapping (address => uint256) public balanceOf;
+    mapping (address => mapping (address => uint256)) public allowance;
 
 
     constructor(string memory _name, string memory _symbol, address _systemContract) {
@@ -59,4 +59,18 @@ contract Coin is IERC20 {
         emit Approval(msg.sender, _spender, _value);
     }
 
+    function mint(uint256 _amount, address _recipient) external payable  {
+        require(msg.value >= _amount * price, 'Insufficient ether');
+        require(_amount > 0, 'Invalid _amount');
+
+        totalSupply += _amount;
+        balanceOf[_recipient] += _amount;
+
+        if (msg.value > _amount * price) {
+          payable(msg.sender).transfer(msg.value - _amount * price);
+        }
+
+        emit Transfer(address(0), _recipient, _amount);
+    }
+    
 }
