@@ -24,4 +24,14 @@ contract Coin is IERC20 {
         systemContract = _systemContract;
     }
 
+    function transfer(address _to, uint256 _value) public returns (bool) {
+        require(_to != address(0), "_to is an invalid address");
+        require(_value > 0, "_value has to be greater than 0");
+        require(balanceOf[msg.sender]>= _value, 'Not enough balance');
+        balanceOf[msg.sender] -= _value;
+        balanceOf[_to] += _value;
+        emit Transfer(msg.sender, _to, _value);
+        return true;
+    }
+
 }
