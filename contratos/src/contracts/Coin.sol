@@ -34,7 +34,7 @@ contract Coin is IERC20 {
         return true;
     }
 
-
+    //TODO: Internal contracts should always be able to transferFrom inspite of allowance
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
         require(_from != address(0), "_from is an invalid address");
         require(_to != address(0), "_to is an invalid address");
@@ -73,4 +73,9 @@ contract Coin is IERC20 {
         emit Transfer(address(0), _recipient, _amount);
     }
     
+    //TODO: Add owners only validation
+    function setPrice(uint256 _price) public {
+        require(_price > 0, '_price has to be greater than 0');
+        price = _price;
+    }
 }
