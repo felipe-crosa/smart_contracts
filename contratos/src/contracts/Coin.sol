@@ -34,4 +34,22 @@ contract Coin is IERC20 {
         return true;
     }
 
+
+    function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
+        require(_from != address(0), "_from is an invalid address");
+        require(_to != address(0), "_to is an invalid address");
+        require(_value > 0, "_value has to be greater than 0");
+        require(balanceOf[_from] >= _value, 'Not enough balance');
+        require(msg.sender == _from || allowance[_from][msg.sender] >= _value, 'Insufficient allowance');
+
+        balanceOf[_from] -= _value;
+        balanceOf[_to] += _value; 
+        if (_from != msg.sender) {
+            allowance[_from][msg.sender] -= _value;
+        }
+        emit Transfer(_from, _to, _value);
+        return true;
+    }
+
+    
 }
