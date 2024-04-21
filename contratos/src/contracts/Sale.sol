@@ -94,5 +94,16 @@ contract Sale is ISale {
         delete activeItemOffers[meta.wantedTokenId];
     }
 
+    function cancelOffer(uint256 _offerId) ValidOffer(_offerId) WaitingOffer(_offerId) public {
+        SaleMetadata memory meta = offerMetadata[_offerId];
+        require(msg.sender == meta.offeringAddress, "Unauthorized");
+
+        meta.status = Status.CANCELED;
+        offerMetadata[_offerId] = meta;
+
+        ICoin coins = ICoin(system.contractAddress("coins"));
+        coins.transfer(meta.offeringAddress, meta.amount);
+    }
+
     
 }
