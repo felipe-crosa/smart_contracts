@@ -1,9 +1,10 @@
 //SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
-import '../interfaces/IERC20.sol';
+import '../interfaces/ICoin.sol';
+import '../interfaces/ISystem.sol';
 
-contract Coin is IERC20 {
+contract Coin is ICoin {
     string public name;
     string public symbol;
     uint8 public decimals;
@@ -14,6 +15,7 @@ contract Coin is IERC20 {
     mapping (address => uint256) public balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
 
+    ISystem internal system;
 
     constructor(string memory _name, string memory _symbol, address _systemContract) {
         require( keccak256(bytes(name)) != keccak256(bytes("")), "Invalid _name" );
@@ -21,7 +23,7 @@ contract Coin is IERC20 {
         name = _name;
         symbol = _symbol;
         decimals = 18;
-        systemContract = _systemContract;
+        system = ISystem(_systemContract);
     }
 
     function transfer(address _to, uint256 _value) public returns (bool) {
@@ -34,13 +36,12 @@ contract Coin is IERC20 {
         return true;
     }
 
-    //TODO: Internal contracts should always be able to transferFrom inspite of allowance
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
         require(_from != address(0), "_from is an invalid address");
         require(_to != address(0), "_to is an invalid address");
         require(_value > 0, "_value has to be greater than 0");
         require(balanceOf[_from] >= _value, 'Not enough balance');
-        require(msg.sender == _from || allowance[_from][msg.sender] >= _value, 'Insufficient allowance');
+        require(msg.sender == _from || allowance[_from][msg.sender] >= _value || system.isInternalContract(msg.sender), 'Insufficient allowance');
 
         balanceOf[_from] -= _value;
         balanceOf[_to] += _value; 
@@ -73,9 +74,9 @@ contract Coin is IERC20 {
         emit Transfer(address(0), _recipient, _amount);
     }
     
-    //TODO: Add owners only validation
     function setPrice(uint256 _price) public {
         require(_price > 0, '_price has to be greater than 0');
+        require(system.isInternalContract(msg.sender), "Unauthorized action");
         price = _price;
     }
 }
