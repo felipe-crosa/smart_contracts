@@ -93,7 +93,27 @@ contract Item is IItem {
         emit Approval(ownerOf[_tokenId], _to, _tokenId);
     }
 
+    function mint(string memory itemName, string memory imageUrl) public returns (uint256 id) {
+        ICoin coins = ICoin(system.contractAddress("coins"));
+        require(coins.balanceOf(msg.sender) > mintPrice,"Not enough balance"); 
+        ItemMetadata memory meta = ItemMetadata({name: itemName, imageURL: imageUrl, amountOfOwners: 0, creator: msg.sender});
+        
+        totalSupply += 1;
+        currentTokenID = totalSupply;
+        coins.transferFrom(msg.sender, address(this), mintPrice);
     
+        _metadataOf[currentTokenID] = meta;
+        ownerOf[currentTokenID] = msg.sender;
+        balanceOf[msg.sender] += 1;
+        return currentTokenID;
+    }
+
+
+    function setMintingPrice(uint256 _mintPrice) public {
+        require(system.isInternalContract(msg.sender), "Unauthorized action.");
+        mintPrice = _mintPrice;
+    }
+
     function metadataOf(uint256 _tokenId) public view returns (ItemMetadata memory _metadata) {
         return _metadataOf[_tokenId];
     }
