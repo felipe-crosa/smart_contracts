@@ -1,0 +1,21 @@
+{
+    "name": "proyecto-smart-contracts",
+    "dependencies": {
+        "@nomicfoundation/hardhat-chai-matchers": "^1.0.5",
+        "@nomiclabs/hardhat-ethers": "^2.2.3",
+        "@openzeppelin/contracts": "^4.9.3",
+        "dotenv": "^16.3.1",
+        "ethers": "^5.7.2"
+    },
+    "devDependencies": {
+        "chai": "^4.3.10",
+        "ethereum-waffle": "^4.0.10",
+        "hardhat": "^2.19.1",
+        "hardhat-contract-sizer": "^2.8.0",
+        "solidity-coverage": "^0.8.5"
+    },
+    "scripts": {
+        "compile": "npx hardhat compile",
+        "test": "npx hardhat test"
+    }
+}
