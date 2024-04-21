@@ -27,6 +27,17 @@ contract Sale is ISale {
         _;
     }
 
+    modifier ValidOffer (uint256 _offerId) {
+        require(_offerId > 0 && _offerId < nextOffer, "Invalid offer");
+        _;
+    }
+
+    modifier WaitingOffer (uint256 _offerId) {
+        require(offerMetadata[_offerId].status == Status.WAITING, "Offer is invalid. Status should be WAITING");
+        _;
+    }
+
+
 
     function publishOffer(uint256 _wantedTokenId, uint256 _amount) public ValidToken(_offerId) returns (uint256 _offerId) {
         address tokenOwner = IItem(system.contractAddress("items")).ownerOf(_wantedTokenId);
@@ -49,7 +60,18 @@ contract Sale is ISale {
         return offerId;
     }
 
+    function rejectOffer(uint256 _offerId) ValidOffer(_offerId) WaitingOffer(_offerId) public {
+        IItem items = IItem(system.contractAddress("items"));
+        SaleMetadata memory sale = offerMetadata[_offerId];
+        require(msg.sender == items.ownerOf(sale.wantedTokenId), "Unauthorized");
 
+        SaleMetadata memory meta = offerMetadata[_offerId];
+        meta.status = Status.REJECTED;
+        offerMetadata[_offerId] = meta;
+
+        ICoin coins = ICoin(system.contractAddress("coins"));
+        coins.transfer(meta.offeringAddress, meta.amount);
+    }
 
     
 }
