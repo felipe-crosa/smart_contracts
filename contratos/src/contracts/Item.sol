@@ -75,49 +75,7 @@ contract Item is IItem {
         _metadataOf[_tokenId] = meta;
     }
 
-    function setApprovalForAll(address _operator, bool _approved) public {
-        fullApproval[msg.sender][_operator] = _approved;
-    }
-
-    function getApproved(uint256 _tokenId) public view returns (address) {
-        return allowance[_tokenId];
-    }
-
-    function isApprovedForAll(address _owner, address _operator) public view returns (bool) {
-        return fullApproval[_owner][_operator];
-    }
-
     
-    function approve(address _to, uint256 _tokenId) public isTokenValid(_tokenId) validAction(_tokenId) {
-        allowance[_tokenId] = _to;
-        emit Approval(ownerOf[_tokenId], _to, _tokenId);
-    }
-
-    function mint(string memory itemName, string memory imageUrl) public returns (uint256 id) {
-        ICoin coins = ICoin(system.contractAddress("coins"));
-        require(coins.balanceOf(msg.sender) > mintPrice,"Not enough balance"); 
-        ItemMetadata memory meta = ItemMetadata({name: itemName, imageURL: imageUrl, amountOfOwners: 0, creator: msg.sender});
-        
-        totalSupply += 1;
-        currentTokenID = totalSupply;
-        coins.transferFrom(msg.sender, address(this), mintPrice);
-    
-        _metadataOf[currentTokenID] = meta;
-        ownerOf[currentTokenID] = msg.sender;
-        balanceOf[msg.sender] += 1;
-        return currentTokenID;
-    }
-
-
-    function setMintingPrice(uint256 _mintPrice) public {
-        require(system.isInternalContract(msg.sender), "Unauthorized action.");
-        mintPrice = _mintPrice;
-    }
-
-    function metadataOf(uint256 _tokenId) public view returns (ItemMetadata memory _metadata) {
-        return _metadataOf[_tokenId];
-    }
-
     function isValidToken(uint256 _tokenId) public view returns (bool) {
         bool isWithinRange = _tokenId <= totalSupply && _tokenId > 0;
         return isWithinRange;
