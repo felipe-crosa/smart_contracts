@@ -9,7 +9,7 @@ require('@nomicfoundation/hardhat-chai-matchers');
  */
 module.exports = {
   solidity: {
-    version: "0.8.16",
+    version: "0.8.19",
     settings: {
       optimizer: {
         enabled: true,
@@ -19,11 +19,11 @@ module.exports = {
   },  
   paths: {
     sources: "./src",
-    tests: "../tests",
+    tests: "./tests",
     cache: "./cache",
     artifacts: "./artifacts"
-  },
-  networks: {
-    sepolia: {}
   }
+  // networks: {
+  //   sepolia: {}
+  // }
 };
