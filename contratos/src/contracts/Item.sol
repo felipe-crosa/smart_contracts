@@ -75,7 +75,29 @@ contract Item is IItem {
         _metadataOf[_tokenId] = meta;
     }
 
+    function setApprovalForAll(address _operator, bool _approved) public {
+        fullApproval[msg.sender][_operator] = _approved;
+    }
+
+    function getApproved(uint256 _tokenId) public view returns (address) {
+        return allowance[_tokenId];
+    }
+
+    function isApprovedForAll(address _owner, address _operator) public view returns (bool) {
+        return fullApproval[_owner][_operator];
+    }
+
     
+    function approve(address _to, uint256 _tokenId) public isTokenValid(_tokenId) validAction(_tokenId) {
+        allowance[_tokenId] = _to;
+        emit Approval(ownerOf[_tokenId], _to, _tokenId);
+    }
+
+    
+    function metadataOf(uint256 _tokenId) public view returns (ItemMetadata memory _metadata) {
+        return _metadataOf[_tokenId];
+    }
+
     function isValidToken(uint256 _tokenId) public view returns (bool) {
         bool isWithinRange = _tokenId <= totalSupply && _tokenId > 0;
         return isWithinRange;
