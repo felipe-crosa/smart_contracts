@@ -73,5 +73,26 @@ contract Sale is ISale {
         coins.transfer(meta.offeringAddress, meta.amount);
     }
 
+    function acceptOffer(uint256 _offerId) ValidOffer(_offerId) WaitingOffer(_offerId) public {
+        IItem items = IItem(system.contractAddress("items"));
+        SaleMetadata memory sale = offerMetadata[_offerId];
+        require(msg.sender == items.ownerOf(sale.wantedTokenId), "Unauthorized");
+        
+        SaleMetadata memory meta = offerMetadata[_offerId];
+        meta.status = Status.ACCEPTED;
+        offerMetadata[_offerId] = meta;
+
+        ICoin coins = ICoin(system.contractAddress("coins"));
+        coins.transfer(msg.sender, meta.amount);
+        items.transferFrom(msg.sender, meta.offeringAddress, meta.wantedTokenId);
+
+        uint256[] memory offers = activeItemOffers[meta.wantedTokenId];
+        for(uint256 i = 0; i < offers.length; i++) {
+            SaleMetadata memory offer = offerMetadata[offers[i]];
+            if(offer.status == Status.WAITING) this.rejectOffer(_offerId);
+        }
+        delete activeItemOffers[meta.wantedTokenId];
+    }
+
     
 }
