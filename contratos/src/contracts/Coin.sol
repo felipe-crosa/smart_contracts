@@ -18,11 +18,12 @@ contract Coin is ICoin {
     ISystem internal system;
 
     constructor(string memory _name, string memory _symbol, address _systemContract) {
-        require( keccak256(bytes(name)) != keccak256(bytes("")), "Invalid _name" );
+        require( keccak256(bytes(_name)) != keccak256(bytes("")), "Invalid _name" );
+        require(bytes(_symbol).length == 3, "Invalid _symbol");
         require(_systemContract != address(0), 'Invalid _systemContract');
         name = _name;
         symbol = _symbol;
-        decimals = 18;
+        decimals = 18; 
         system = ISystem(_systemContract);
     }
 
@@ -41,11 +42,12 @@ contract Coin is ICoin {
         require(_to != address(0), "_to is an invalid address");
         require(_value > 0, "_value has to be greater than 0");
         require(balanceOf[_from] >= _value, 'Not enough balance');
-        require(msg.sender == _from || allowance[_from][msg.sender] >= _value || system.isInternalContract(msg.sender), 'Insufficient allowance');
+        bool isInternalContract = system.isInternalContract(msg.sender);
+        require(msg.sender == _from || allowance[_from][msg.sender] >= _value || isInternalContract, 'Insufficient allowance');
 
         balanceOf[_from] -= _value;
         balanceOf[_to] += _value; 
-        if (_from != msg.sender) {
+        if (_from != msg.sender && !isInternalContract) {
             allowance[_from][msg.sender] -= _value;
         }
         emit Transfer(_from, _to, _value);
