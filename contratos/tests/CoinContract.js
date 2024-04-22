@@ -262,4 +262,38 @@ describe("Coin", async function () {
     });
 
 
+    describe("Mint", function () {
+        it("Mint successful", async function () {
+            _systemContract = await ethers.deployContract("System", [], {});
+            _coinContract = await ethers.deployContract("Coin", ["coin", "CIN", _systemContract.address], {});
+            await _coinContract.setPrice(2)
+            await    
+            await expect(_coinContract.mint(5, _user1.address, { value: 10 })).to.changeEtherBalance(_user1, "-10");
+            await expect(await _coinContract.balanceOf(_user1.address)).to.be.equal(5);
+            await expect(await _coinContract.totalSupply()).to.be.equal(5);
+        });
+
+        it("mint with insufficient balance", async function () {
+            _systemContract = await ethers.deployContract("System", [], {});
+            _coinContract = await ethers.deployContract("Coin", ["coin", "CIN", _systemContract.address], {});
+            await _coinContract.setPrice(2)
+            await expect(_coinContract.mint(100, _user1.address, { value: 10 })).to.be.rejectedWith("Insufficient ether")  
+        });
+
+        it("mint with exceeding balance", async function () {
+            _systemContract = await ethers.deployContract("System", [], {});
+            _coinContract = await ethers.deployContract("Coin", ["coin", "CIN", _systemContract.address], {});
+            await _coinContract.setPrice(2)
+            await    
+            await expect(_coinContract.mint(5, _user1.address, { value: 100 })).to.changeEtherBalance(_user1, "-10");
+            await expect(await _coinContract.balanceOf(_user1.address)).to.be.equal(5);
+        });
+
+        it("mint 0", async function () {
+            _systemContract = await ethers.deployContract("System", [], {});
+            _coinContract = await ethers.deployContract("Coin", ["coin", "CIN", _systemContract.address], {});
+            await expect(_coinContract.mint(0, _user1.address)).to.be.rejectedWith("Invalid _amount")
+        });
+    });
+
 });
