@@ -44,6 +44,60 @@ describe("Coin", async function () {
         });
     });
 
-    
+    describe("Name", function () {
+        it("Success get name", async function () {
+            _systemContract = await ethers.deployContract("System", [], {});
+            _coinContract = await ethers.deployContract("Coin", ["coin", "CIN", _systemContract.address], {});
+            await expect(await _coinContract.name()).to.be.equal("coin");
+        });
+    });
+
+    describe("Symbol", function () {
+        it("Success get symbol", async function () {
+            _systemContract = await ethers.deployContract("System", [], {});
+            _coinContract = await ethers.deployContract("Coin", ["coin", "CIN", _systemContract.address], {});
+            await expect(await _coinContract.symbol()).to.be.equal("CIN");
+        });
+    });
+
+    describe("Decimals", function () {
+        it("Success get decimals", async function () {
+            _systemContract = await ethers.deployContract("System", [], {});
+            _coinContract = await ethers.deployContract("Coin", ["coin", "CIN", _systemContract.address], {});
+            await expect(await _coinContract.decimals()).to.be.equal(18);
+        });
+    });
+
+    describe("Total Supply", function () {
+        it("Starts as 0", async function () {
+            _systemContract = await ethers.deployContract("System", [], {});
+            _coinContract = await ethers.deployContract("Coin", ["coin", "CIN", _systemContract.address], {});
+            await expect(await _coinContract.totalSupply()).to.be.equal(0);
+        });
+
+        it("Increases when new are minted", async function () {
+            _systemContract = await ethers.deployContract("System", [], {});
+            _coinContract = await ethers.deployContract("Coin", ["coin", "CIN", _systemContract.address], {});
+            await _coinContract.setPrice(1)
+            await _coinContract.mint(10, _user2.address, { value: 10 })
+            await expect(await _coinContract.totalSupply()).to.be.equal(10);
+        });
+    });
+
+    describe("Balance Of", function () {
+        it("Starts as 0 for all users", async function () {
+            _systemContract = await ethers.deployContract("System", [], {});
+            _coinContract = await ethers.deployContract("Coin", ["coin", "CIN", _systemContract.address], {});
+            await expect(await _coinContract.balanceOf(_user2.address)).to.be.equal(0);
+        });
+
+        it("User has balance", async function () {
+            _systemContract = await ethers.deployContract("System", [], {});
+            _coinContract = await ethers.deployContract("Coin", ["coin", "CIN", _systemContract.address], {});
+            await _coinContract.setPrice(1)
+            await _coinContract.mint(10, _user2.address, { value: 10 })
+            await expect(await _coinContract.balanceOf(_user2.address)).to.be.equal(10);
+        });
+    });
 
 });
