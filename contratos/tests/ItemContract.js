@@ -20,29 +20,15 @@ describe("Item", async function () {
     describe("Deployment", function () {
         it("Test Deploy", async function () {
             _systemContract = await ethers.deployContract("System", [], {});
-            await ethers.deployContract("Item", ["Item", "ITM", _systemContract.address], {});
-        });
-
-        it("Invalid name", async function () {
-            _systemContract = await ethers.deployContract("System", [], {});
-            await expect(ethers.deployContract("Item", ["", "ITM", _systemContract.address], {})).to.be.rejectedWith("Invalid _name");
-        });
-
-        it("Invalid symbol with length < 3", async function () {
-            _systemContract = await ethers.deployContract("System", [], {});
-            await expect(ethers.deployContract("Item", ["Item", "IT", _systemContract.address], {})).to.be.rejectedWith("Invalid _symbol");
-        });
-
-        it("Invalid symbol with length > 3", async function () {
-            _systemContract = await ethers.deployContract("System", [], {});
-            await expect(ethers.deployContract("Item", ["Item", "1234", _systemContract.address], {})).to.be.rejectedWith("Invalid _symbol");
+            await ethers.deployContract("Item", [_systemContract.address], {});
         });
 
         it("Invalid system contract address", async function () {
             _systemContract = await ethers.deployContract("System", [], {});
-            await expect(ethers.deployContract("Item", ["Item", "ITM", ethers.constants.AddressZero], {})).to.be.rejectedWith("Invalid _systemContract");
+            await expect(ethers.deployContract("Item", [ethers.constants.AddressZero], {})).to.be.rejectedWith("Invalid _systemContract");
         });
     });
+
 
     
 

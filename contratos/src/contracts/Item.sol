@@ -20,12 +20,8 @@ contract Item is IItem {
 
     ISystem internal system;
 
-    constructor(string memory _name, string memory _symbol, address _systemContract)  {
-        require (keccak256(bytes(_name)) != keccak256(bytes("")), "Invalid _name");
-        require(bytes(_symbol).length == 3, "Invalid _symbol");
+    constructor(address _systemContract)  {
         require(_systemContract != address(0), 'Invalid _systemContract');
-        name = _name;
-        symbol = _symbol;
         currentTokenID=1;
         system = ISystem(_systemContract);
     }
