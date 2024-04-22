@@ -135,4 +135,77 @@ describe("Coin", async function () {
         });
     });
 
+    describe("TransferFrom", async function () {
+        it("Successful Transfer From as Owner", async function () {
+            _systemContract = await ethers.deployContract("System", [], {});
+            _coinContract = await ethers.deployContract("Coin", ["coin", "CIN", _systemContract.address], {});
+            await _coinContract.setPrice(1)
+            await _coinContract.mint(10, _user1.address, { value: 10 })
+            await _coinContract.transferFrom(_user1.address, _user2.address, 5)
+            await expect(await _coinContract.balanceOf(_user2.address)).to.be.equal(5);
+            await expect(await _coinContract.balanceOf(_user1.address)).to.be.equal(5);
+        });
+
+        it("Transfer From without sufficient allowance", async function () {
+            _systemContract = await ethers.deployContract("System", [], {});
+            _coinContract = await ethers.deployContract("Coin", ["coin", "CIN", _systemContract.address], {});
+            await _coinContract.setPrice(1)
+            await _coinContract.mint(10, _user1.address, { value: 10 })
+            await expect(_coinContract.connect(_user2).transferFrom(_user1.address, _user2.address, 5)).to.be.rejectedWith("Insufficient allowance")
+        });
+
+        it("Transfer From With allowance", async function () {
+            _systemContract = await ethers.deployContract("System", [], {});
+            _coinContract = await ethers.deployContract("Coin", ["coin", "CIN", _systemContract.address], {});
+            await _coinContract.setPrice(1)
+            await _coinContract.mint(10, _user1.address, { value: 10 })
+            await _coinContract.approve(_user2.address, 5)
+            await _coinContract.connect(_user2).transferFrom(_user1.address, _user2.address, 5)
+            await expect(await _coinContract.balanceOf(_user2.address)).to.be.equal(5);
+            await expect(await _coinContract.balanceOf(_user1.address)).to.be.equal(5);
+            await expect(await _coinContract.allowance(_user1.address, _user2.address)).to.be.equal(0)
+        });
+
+        it("Transfer From Without allowance but from internal contract", async function () {
+            _systemContract = await ethers.deployContract("System", [], {});
+            _coinContract = await ethers.deployContract("Coin", ["coin", "CIN", _systemContract.address], {});
+            await _coinContract.setPrice(1)
+            await _coinContract.mint(10, _user2.address, { value: 10 })
+            await _coinContract.connect(_user1).transferFrom(_user2.address, _user3.address, 5)
+            await expect(await _coinContract.balanceOf(_user2.address)).to.be.equal(5);
+            await expect(await _coinContract.balanceOf(_user3.address)).to.be.equal(5);
+        });
+
+
+        it("TransferFrom more than balance", async function () {
+            _systemContract = await ethers.deployContract("System", [], {});
+            _coinContract = await ethers.deployContract("Coin", ["coin", "CIN", _systemContract.address], {});
+            await _coinContract.setPrice(1)
+            await _coinContract.mint(10, _user1.address, { value: 10 })        
+            await expect(_coinContract.transferFrom(_user1.address, _user2.address, 15)).to.be.revertedWith("Not enough balance")
+        });
+
+        it("Transfer 0", async function () {
+            _systemContract = await ethers.deployContract("System", [], {});
+            _coinContract = await ethers.deployContract("Coin", ["coin", "CIN", _systemContract.address], {});
+            await _coinContract.setPrice(1)
+            await _coinContract.mint(10, _user1.address, { value: 10 })        
+            await expect(_coinContract.transferFrom(_user1.address, _user2.address, 0)).to.be.revertedWith("_value has to be greater than 0")
+        });
+
+        it("Transfer to address 0", async function () {
+            _systemContract = await ethers.deployContract("System", [], {});
+            _coinContract = await ethers.deployContract("Coin", ["coin", "CIN", _systemContract.address], {});
+            await _coinContract.setPrice(1)
+            await _coinContract.mint(10, _user1.address, { value: 10 })        
+            await expect(_coinContract.transferFrom(_user1.address, ethers.constants.AddressZero, 1)).to.be.revertedWith("_to is an invalid address")
+        });
+
+        it("Transfer from address 0", async function () {
+            _systemContract = await ethers.deployContract("System", [], {});
+            _coinContract = await ethers.deployContract("Coin", ["coin", "CIN", _systemContract.address], {});
+            await expect(_coinContract.transferFrom(ethers.constants.AddressZero,  _user1.address,1)).to.be.revertedWith("_from is an invalid address")
+        });
+    });
+    
 });
