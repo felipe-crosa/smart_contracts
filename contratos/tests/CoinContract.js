@@ -100,4 +100,39 @@ describe("Coin", async function () {
         });
     });
 
+
+    describe("Transfer", async function () {
+        it("Successful Transfer", async function () {
+            _systemContract = await ethers.deployContract("System", [], {});
+            _coinContract = await ethers.deployContract("Coin", ["coin", "CIN", _systemContract.address], {});
+            await _coinContract.setPrice(1)
+            await _coinContract.mint(10, _user1.address, { value: 10 })
+            await _coinContract.transfer(_user2.address, 5)
+            await expect(await _coinContract.balanceOf(_user2.address)).to.be.equal(5);
+            await expect(await _coinContract.balanceOf(_user1.address)).to.be.equal(5);
+        });
+
+        it("Transfer more than balance", async function () {
+            _systemContract = await ethers.deployContract("System", [], {});
+            _coinContract = await ethers.deployContract("Coin", ["coin", "CIN", _systemContract.address], {});
+            await _coinContract.setPrice(1)
+            await _coinContract.mint(10, _user1.address, { value: 10 })
+            await expect(_coinContract.transfer(_user2.address, 15)).to.be.revertedWith("Not enough balance")
+        });
+
+        it("Transfer 0", async function () {
+            _systemContract = await ethers.deployContract("System", [], {});
+            _coinContract = await ethers.deployContract("Coin", ["coin", "CIN", _systemContract.address], {});
+            await expect(_coinContract.transfer(_user2.address, 0)).to.be.revertedWith("_value has to be greater than 0")
+        });
+
+        it("Transfer to address 0", async function () {
+            _systemContract = await ethers.deployContract("System", [], {});
+            _coinContract = await ethers.deployContract("Coin", ["coin", "CIN", _systemContract.address], {});
+            await _coinContract.setPrice(1)
+            await _coinContract.mint(10, _user1.address, { value: 10 })
+            await expect(_coinContract.transfer(ethers.constants.AddressZero, 10)).to.be.revertedWith("_to is an invalid address")
+        });
+    });
+
 });
