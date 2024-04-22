@@ -208,4 +208,36 @@ describe("Coin", async function () {
         });
     });
     
+    describe("Approve and Allowance", function () {
+        it("Approve user successfuly", async function () {
+            _systemContract = await ethers.deployContract("System", [], {});
+            _coinContract = await ethers.deployContract("Coin", ["coin", "CIN", _systemContract.address], {});
+            await _coinContract.setPrice(1)
+            await _coinContract.mint(10, _user1.address, { value: 10 })        
+            await _coinContract.approve(_user2.address, 10)
+            await expect(await _coinContract.allowance(_user1.address, _user2.address)).to.be.equal(10);
+        });
+
+        it("Approve user with more than current balance", async function () {
+            _systemContract = await ethers.deployContract("System", [], {});
+            _coinContract = await ethers.deployContract("Coin", ["coin", "CIN", _systemContract.address], {});
+            await expect(_coinContract.approve(_user2.address, 10)).to.be.revertedWith("Not enough balance");
+        });
+
+        it("Approve user which already has allowance", async function () {
+            _systemContract = await ethers.deployContract("System", [], {});
+            _coinContract = await ethers.deployContract("Coin", ["coin", "CIN", _systemContract.address], {});
+            await _coinContract.setPrice(1)
+            await _coinContract.mint(10, _user1.address, { value: 10 })        
+            await _coinContract.approve(_user2.address, 10)
+            await expect(_coinContract.approve(_user2.address, 10)).to.be.revertedWith("_spender already has an allowance. Set to 0 before assigning new value.");
+        });
+
+        it("Approve address 0", async function () {
+            _systemContract = await ethers.deployContract("System", [], {});
+            _coinContract = await ethers.deployContract("Coin", ["coin", "CIN", _systemContract.address], {});
+            await expect(_coinContract.approve(ethers.constants.AddressZero, 10)).to.be.revertedWith("_spender is an invalid address");
+        });
+    });
+
 });
