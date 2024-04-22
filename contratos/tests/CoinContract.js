@@ -240,4 +240,26 @@ describe("Coin", async function () {
         });
     });
 
+    describe("Set Price", function () {
+        it("set price successful", async function () {
+            _systemContract = await ethers.deployContract("System", [], {});
+            _coinContract = await ethers.deployContract("Coin", ["coin", "CIN", _systemContract.address], {});
+            await _coinContract.setPrice(100)
+            await expect(await _coinContract.price()).to.be.equal(100);
+        });
+
+        it("set price to 0", async function () {
+            _systemContract = await ethers.deployContract("System", [], {});
+            _coinContract = await ethers.deployContract("Coin", ["coin", "CIN", _systemContract.address], {});
+            await expect(_coinContract.setPrice(0)).to.be.rejectedWith("_price has to be greater than 0")
+        });
+
+        it("set price when not owner nor internal contract", async function () {
+            _systemContract = await ethers.deployContract("System", [], {});
+            _coinContract = await ethers.deployContract("Coin", ["coin", "CIN", _systemContract.address], {});
+            await expect(_coinContract.connect(_user2).setPrice(10)).to.be.rejectedWith("Unauthorized action")
+        });
+    });
+
+
 });
