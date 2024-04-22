@@ -22,5 +22,17 @@ describe("System", async function () {
         });
     });
 
+    describe("Add Internal Contract", function () {
+        it("Test Add new Internal Contract Successful", async function () {
+            _systemContract = await ethers.deployContract("System", [], {});
+            await _systemContract.addContract("TEST", _user2.address);
+            await expect(await _systemContract.isInternalContract(_user2.address)).to.be.equal(true)
+            await expect(await _systemContract.contractAddress("TEST")).to.be.equal(_user2.address)
+        });
+        it("Only owner can add new contract", async function () {
+            _systemContract = await ethers.deployContract("System", [], {});
+            await expect(_systemContract.connect(_user2).addContract("TEST", _user2.address)).to.be.revertedWith("You are not authorized to add new contracts");
+        });
+    });
 
 });
