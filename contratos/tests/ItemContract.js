@@ -90,6 +90,31 @@ describe("Item", async function () {
         });
     })
 
+    describe("Balance Of", function () {
+        it("one nft", async function () {
+            _itemContract = await ethers.deployContract("Item", [_systemContract.address], {});
+            await _systemContract.addContract("items", _itemContract.address)
+            await _itemContract.setMintingPrice(1);
+            await _itemContract.mint("test", "123")
+            await expect(await _itemContract.balanceOf(_user1.address)).to.be.equal(1)
+        });
+
+        it("two nft", async function () {
+            _itemContract = await ethers.deployContract("Item", [_systemContract.address], {});
+            await _systemContract.addContract("items", _itemContract.address)
+            await _itemContract.setMintingPrice(1);
+            await _itemContract.mint("test", "123")
+            await _itemContract.mint("test2", "1234")
+            await expect(await _itemContract.balanceOf(_user1.address)).to.be.equal(2)
+        });
+
+        it("zero nft", async function () {
+            _itemContract = await ethers.deployContract("Item", [_systemContract.address], {});
+            await _systemContract.addContract("items", _itemContract.address)
+            await expect(await _itemContract.balanceOf(_user1.address)).to.be.equal(0)
+        });
+    })
+
  
 
 
