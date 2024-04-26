@@ -52,6 +52,28 @@ describe("Item", async function () {
 
     });
 
+    describe("Mint", function () {
+        it("mint successful", async function () {
+            _itemContract = await ethers.deployContract("Item", [_systemContract.address], {});
+            await _systemContract.addContract("items", _itemContract.address)
+            await _itemContract.setMintingPrice(1);
+            await _itemContract.mint("test", "123")
+            await expect(await _itemContract.totalSupply()).to.be.equal(1)
+            await expect((await _itemContract.metadataOf(1)).name).to.equal("test")
+            await expect((await _itemContract.metadataOf(1)).amountOfOwners).to.equal(1)
+            await expect((await _itemContract.metadataOf(1)).creator).to.equal(_user1.address)
+            await expect((await _itemContract.metadataOf(1)).imageURL).to.equal("123")
+            await expect(await _coinContract.balanceOf(_user1.address)).to.be.equal(9)
+        });
+
+        it("mint with insufficient balance", async function () {
+            _itemContract = await ethers.deployContract("Item", [_systemContract.address], {});
+            await _systemContract.addContract("items", _itemContract.address)
+            await _itemContract.setMintingPrice(1000);
+            await expect(_itemContract.mint("test", "123")).to.be.rejectedWith("Not enough balance")
+        });
+    })
+
  
 
 
