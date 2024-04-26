@@ -22,13 +22,13 @@ contract Item is IItem {
 
     constructor(address _systemContract)  {
         require(_systemContract != address(0), 'Invalid _systemContract');
-        currentTokenID=1;
+        currentTokenID=13;
         system = ISystem(_systemContract);
     }
 
     modifier validAction (uint256 _tokenId) {
         bool isOwner = ownerOf[_tokenId] == msg.sender;
-        bool hasAllowance = allowance[_tokenId] == msg.sender;
+        bool hasAllowance = allowance[_tokenId] == msg.sender || fullApproval[ownerOf[_tokenId]][msg.sender];
         bool isInternalContract = system.isInternalContract(msg.sender);
 
         require(isOwner || hasAllowance || isInternalContract, "Not authorized");
@@ -73,6 +73,7 @@ contract Item is IItem {
     }
 
     function setApprovalForAll(address _operator, bool _approved) public {
+        require(_operator != address(0), "Invalid _operator address");
         fullApproval[msg.sender][_operator] = _approved;
     }
 
@@ -86,14 +87,15 @@ contract Item is IItem {
 
     
     function approve(address _to, uint256 _tokenId) public isTokenValid(_tokenId) validAction(_tokenId) {
+        require(_to != address(0), "Invalid _to address");
         allowance[_tokenId] = _to;
         emit Approval(ownerOf[_tokenId], _to, _tokenId);
     }
 
-    function mint(string memory itemName, string memory imageUrl) public returns (uint256 id) {
+    function mint(string memory itemName, string memory imageUrl) public returns (uint256) {
         ICoin coins = ICoin(system.contractAddress("coins"));
-        require(coins.balanceOf(msg.sender) > mintPrice,"Not enough balance"); 
-        ItemMetadata memory meta = ItemMetadata({name: itemName, imageURL: imageUrl, amountOfOwners: 0, creator: msg.sender});
+        require(coins.balanceOf(msg.sender) >= mintPrice,"Not enough balance"); 
+        ItemMetadata memory meta = ItemMetadata({name: itemName, imageURL: imageUrl, amountOfOwners: 1, creator: msg.sender});
         
         totalSupply += 1;
         currentTokenID = totalSupply;
@@ -107,6 +109,7 @@ contract Item is IItem {
 
 
     function setMintingPrice(uint256 _mintPrice) public {
+        require(_mintPrice > 0, "_mintPrice has to be bigger than 0");
         require(system.isInternalContract(msg.sender), "Unauthorized action.");
         mintPrice = _mintPrice;
     }
