@@ -204,6 +204,66 @@ describe("Item", async function () {
     
     })
 
+    describe("Transfer From", function () {
+        it("transfer from own account", async function () {
+            _itemContract = await ethers.deployContract("Item", [_systemContract.address], {});
+            await _systemContract.addContract("items", _itemContract.address)
+            await _itemContract.setMintingPrice(1);
+            await _itemContract.mint("test", "123")
+
+            await _itemContract.transferFrom(_user1.address, _user2.address, 1)
+            await expect(await _itemContract.ownerOf(1)).to.be.equal(_user2.address)
+            await expect((await _itemContract.metadataOf(1)).amountOfOwners).to.be.equal(2)
+        });
+        it("transfer with approval", async function () {
+            _itemContract = await ethers.deployContract("Item", [_systemContract.address], {});
+            await _systemContract.addContract("items", _itemContract.address)
+            await _itemContract.setMintingPrice(1);
+            await _itemContract.mint("test", "123")
+            await _itemContract.approve(_user2.address, 1)
+
+            await _itemContract.connect(_user2).transferFrom(_user1.address, _user2.address, 1)
+            await expect(await _itemContract.ownerOf(1)).to.be.equal(_user2.address)
+        });
+        it("transfer with full approval", async function () {
+            _itemContract = await ethers.deployContract("Item", [_systemContract.address], {});
+            await _systemContract.addContract("items", _itemContract.address)
+            await _itemContract.setMintingPrice(1);
+            await _itemContract.mint("test", "123")
+            await _itemContract.setApprovalForAll(_user2.address, true)
+
+            await _itemContract.connect(_user2).safeTransferFrom(_user1.address, _user2.address, 1)
+            await expect(await _itemContract.ownerOf(1)).to.be.equal(_user2.address)
+        });
+        it("transfer from internal contract", async function () {
+            _itemContract = await ethers.deployContract("Item", [_systemContract.address], {});
+            await _systemContract.addContract("items", _itemContract.address)
+            await _itemContract.setMintingPrice(1);
+            await _itemContract.mint("test", "123")
+            _systemContract.addContract("internal", _user3.address)
+
+            await _itemContract.connect(_user3).transferFrom(_user1.address, _user2.address, 1)
+            await expect(await _itemContract.ownerOf(1)).to.be.equal(_user2.address)
+        });
+        it("transfer non existing token", async function () {
+            _itemContract = await ethers.deployContract("Item", [_systemContract.address], {});
+            await _systemContract.addContract("items", _itemContract.address)
+            await expect(_itemContract.transferFrom(_user1.address, _user2.address, 1)).to.be.rejectedWith("Invalid _tokenId")
+        });
+        
+        it("transfer to address 0", async function () {
+            _itemContract = await ethers.deployContract("Item", [_systemContract.address], {});
+            await _systemContract.addContract("items", _itemContract.address)
+            await _itemContract.setMintingPrice(1);
+            await _itemContract.mint("test", "123")
+            await expect(_itemContract.transferFrom(_user1.address, ethers.constants.AddressZero, 1)).to.be.rejectedWith("Invalid address")
+        });
+       
+    })
+    
+
+
+ 
 
 
 
