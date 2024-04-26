@@ -115,6 +115,22 @@ describe("Item", async function () {
         });
     })
 
+    describe("Owner Of", function () {
+        it("existing nft", async function () {
+            _itemContract = await ethers.deployContract("Item", [_systemContract.address], {});
+            await _systemContract.addContract("items", _itemContract.address)
+            await _itemContract.setMintingPrice(1);
+            await _itemContract.mint("test", "123")
+            await expect(await _itemContract.ownerOf(1)).to.be.equal(_user1.address)
+        });
+
+        it("non existing nft", async function () {
+            _itemContract = await ethers.deployContract("Item", [_systemContract.address], {});
+            await _systemContract.addContract("items", _itemContract.address)
+            await expect(await _itemContract.ownerOf(1)).to.be.equal(ethers.constants.AddressZero)
+        });
+    })
+
  
 
 
