@@ -74,6 +74,22 @@ describe("Item", async function () {
         });
     })
 
+    describe("Is Token Valid", function () {
+        it("valid token", async function () {
+            _itemContract = await ethers.deployContract("Item", [_systemContract.address], {});
+            await _systemContract.addContract("items", _itemContract.address)
+            await _itemContract.setMintingPrice(1);
+            await _itemContract.mint("test", "123")
+            await expect(await _itemContract.isValidToken(1)).to.be.equal(true)
+        });
+
+        it("invalid token", async function () {
+            _itemContract = await ethers.deployContract("Item", [_systemContract.address], {});
+            await _systemContract.addContract("items", _itemContract.address)
+            await expect(await _itemContract.isValidToken(1)).to.be.equal(false)
+        });
+    })
+
  
 
 
