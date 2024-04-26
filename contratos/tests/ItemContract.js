@@ -203,7 +203,7 @@ describe("Item", async function () {
         });
     
     })
-
+    
     describe("Transfer From", function () {
         it("transfer from own account", async function () {
             _itemContract = await ethers.deployContract("Item", [_systemContract.address], {});
@@ -232,7 +232,7 @@ describe("Item", async function () {
             await _itemContract.mint("test", "123")
             await _itemContract.setApprovalForAll(_user2.address, true)
 
-            await _itemContract.connect(_user2).safeTransferFrom(_user1.address, _user2.address, 1)
+            await _itemContract.connect(_user2).transferFrom(_user1.address, _user2.address, 1)
             await expect(await _itemContract.ownerOf(1)).to.be.equal(_user2.address)
         });
         it("transfer from internal contract", async function () {
