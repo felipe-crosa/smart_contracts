@@ -14,5 +14,7 @@ interface ISale {
     function rejectOffer(uint256 _offerId) external;
     function acceptOffer(uint256 _offerId) external;
     function cancelOffer(uint256 _offerId) external;
+    function userSentOffers(address _user) view external returns (uint256[] memory);
+    function userReceivedOffers(address _user) view external returns (uint256[] memory);
 }
     
