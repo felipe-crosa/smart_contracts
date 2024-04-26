@@ -5,19 +5,19 @@ async function main() {
     await systemContract.deployed();
 
 
-    const coinContract = await ethers.deployContract("Coin", ["coin", "CIN", _systemContract.address], {});
-    const itemContract = await ethers.deployContract("Item", [_systemContract.address], {});
-    const saleContract = await ethers.deployContract("Sale", [_systemContract.address], {});
+    const coinContract = await ethers.deployContract("Coin", ["coin", "CIN", systemContract.address], {});
+    const itemContract = await ethers.deployContract("Item", [ systemContract.address], {});
+    const saleContract = await ethers.deployContract("Sale", [ systemContract.address], {});
 
     await Promise.all([coinContract.deployed(), itemContract.deployed(), saleContract.deployed()])
 
-    await _systemContract.addContract("coins", _coinContract.address)
-    await _systemContract.addContract("items", _itemContract.address)
-    await _systemContract.addContract("sales", _saleContract.address)
+    await systemContract.addContract("coins", coinContract.address)
+    await systemContract.addContract("items", itemContract.address)
+    await systemContract.addContract("sales", saleContract.address)
 
     await Promise.all([
-        _itemContract.setMintingPrice(5),
-        _coinContract.setPrice(1),
+        itemContract.setMintingPrice(5),
+        coinContract.setPrice(1),
     ])
 
     console.log("SystemContract", systemContract.address);
