@@ -131,7 +131,79 @@ describe("Item", async function () {
         });
     })
 
- 
+    describe("Approve", function () {
+        it("approve user successful", async function () {
+            _itemContract = await ethers.deployContract("Item", [_systemContract.address], {});
+            await _systemContract.addContract("items", _itemContract.address)
+            await _itemContract.setMintingPrice(1);
+            await _itemContract.mint("test", "123")
+
+            await _itemContract.approve(_user2.address, 1)
+            await expect(await _itemContract.getApproved(1)).to.be.equal(_user2.address)
+
+        });
+        it("approve of not owned token", async function () {
+            _itemContract = await ethers.deployContract("Item", [_systemContract.address], {});
+            await _systemContract.addContract("items", _itemContract.address)
+            await _itemContract.setMintingPrice(1);
+            await _itemContract.mint("test", "123")
+
+            await expect(_itemContract.connect(_user3).approve(_user2.address, 1)).to.be.rejectedWith("Not authorized")
+        });
+        it("approve as internal contract", async function () {
+            _itemContract = await ethers.deployContract("Item", [_systemContract.address], {});
+            await _systemContract.addContract("items", _itemContract.address)
+            await _systemContract.addContract("test", _user3.address)
+            await _itemContract.setMintingPrice(1);
+            await _itemContract.mint("test", "123")
+
+            await _itemContract.connect(_user3).approve(_user2.address, 1)
+            await expect(await _itemContract.getApproved(1)).to.be.equal(_user2.address)
+        });
+        it("approve non existing token", async function () {
+            _itemContract = await ethers.deployContract("Item", [_systemContract.address], {});
+            await _systemContract.addContract("items", _itemContract.address)
+            await expect(_itemContract.approve(_user2.address, 1)).to.be.rejectedWith("Invalid _tokenId")
+        });
+
+        it("approve address 0", async function () {
+            _itemContract = await ethers.deployContract("Item", [_systemContract.address], {});
+            await _systemContract.addContract("items", _itemContract.address)
+            await _itemContract.setMintingPrice(1);
+            await _itemContract.mint("test", "123")
+
+            await expect(_itemContract.approve(ethers.constants.AddressZero, 1)).to.be.rejectedWith("Invalid _to address")
+        });
+    })
+    
+    describe("Approve For All", function () {
+        it("approve user successful", async function () {
+            _itemContract = await ethers.deployContract("Item", [_systemContract.address], {});
+            await _systemContract.addContract("items", _itemContract.address)
+
+            await _itemContract.setApprovalForAll(_user2.address, true)
+            await expect(await _itemContract.isApprovedForAll(_user1.address, _user2.address)).to.be.equal(true)
+
+        });
+
+        it("remove user approval successful", async function () {
+            _itemContract = await ethers.deployContract("Item", [_systemContract.address], {});
+            await _systemContract.addContract("items", _itemContract.address)
+            await _itemContract.setApprovalForAll(_user2.address, true)
+            await expect(await _itemContract.isApprovedForAll(_user1.address, _user2.address)).to.be.equal(true)
+            await _itemContract.setApprovalForAll(_user2.address, false)
+            await expect(await _itemContract.isApprovedForAll(_user1.address, _user2.address)).to.be.equal(false)
+        });
+
+        it("approve address 0", async function () {
+            _itemContract = await ethers.deployContract("Item", [_systemContract.address], {});
+            await _systemContract.addContract("items", _itemContract.address)
+
+            await expect(_itemContract.setApprovalForAll(ethers.constants.AddressZero, true)).to.be.rejectedWith("Invalid _operator address")
+        });
+    
+    })
+
 
 
 
