@@ -1,0 +1,24 @@
+<div class="min-h-screen h-full w-full bg-slate-100 flex flex-col">
+    <app-navbar (created)="loadData()" (bought)="loadCoins()" [coins]="coins"></app-navbar>
+    <div class="flex items-center justify-start flex-wrap w-fill space-y-2 mt-8 mx-auto px-10">
+      <div *ngFor="let item of items" class="w-80 mr-4 flex flex-col">
+        <div class="h-60 w-full bg-white rounded-t-lg overflow-hidden">
+          <img 
+            [src]="item.imageURL"
+            class="w-fit overflow-hidden" 
+          />
+        </div>
+  
+        <button (click)="setSelection(item)" class="w-full h-16 bg-blue-500 rounded-b-lg flex flex-col">
+          <span class="mx-auto my-auto text-white font-semibold">{{item.name}}</span>
+        </button>
+      </div>
+      
+    
+    </div>
+  </div>
+
+  <app-nft-modal (makeOffer)="makeOffer()" (close)="closeNFT()" [nft]="selectedItem" *ngIf="showNFT && !!selectedItem"></app-nft-modal>
+  <app-new-offer-modal (close)="closeOffer()" [nft]="selectedItem" *ngIf="showMakeOffer && !!selectedItem"></app-new-offer-modal>
+
+  
