@@ -21,6 +21,7 @@ export class SentOffersComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
       await this.loadCoins()
+      await this.loadOffers()
   }
 
   async loadCoins(){

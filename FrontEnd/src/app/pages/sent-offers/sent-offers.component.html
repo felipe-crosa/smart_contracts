@@ -12,7 +12,7 @@
             <span class="mx-auto my-auto text-white font-semibold">{{offer.amount}} coins</span>
             <span class="mx-auto my-auto text-white font-semibold uppercase">{{offer.status}}</span>
         </div>
-        <button class="w-full h-16 bg-blue-500 rounded-b-lg flex flex-col">
+        <button (click)="showOffer(offer)" class="w-full h-16 bg-blue-500 rounded-b-lg flex flex-col">
           <span class="mx-auto my-auto text-white font-semibold">{{offer.nft.name}}</span>
         </button>
       </div>

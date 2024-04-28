@@ -19,26 +19,29 @@ export class SaleService {
 
     const contract : any = new Contract(this.contractAddress, SALE_CONTRACT_ABI, this.metamask.provider?.getSigner());
     const offers = await contract.userSentOffers(this.metamask.walletAddress)
+
     const metadata = await Promise.all(offers.map((x: any)=> {
       const id = x.toNumber()
-      contract.offerMetadata(id)
+      return contract.offerMetadata(id)
     }))
+
 
     const nfts = await Promise.all(metadata.map(meta => {
       const id = meta.wantedTokenId.toNumber()
       return this.itemService.getItem(id)
     }))
 
-    return metadata.map((value, index) => {
+    const res =  metadata.map((value, index) => {
       const offer : Offer = {
         ID: offers[index],
         nft: nfts[index],
         amount: value.amount.toNumber(),
-        status: STATUS[value.status.toNumber()],
+        status: STATUS[value.status],
         offeringAddress: value.offeringAddress
       }
       return offer
     })
+    return res
   }
 
   async getReceivedOffers() : Promise<Offer[]> {
@@ -46,47 +49,54 @@ export class SaleService {
 
     const contract : any = new Contract(this.contractAddress, SALE_CONTRACT_ABI, this.metamask.provider?.getSigner());
     const offers = await contract.userReceivedOffers(this.metamask.walletAddress)
+
     const metadata = await Promise.all(offers.map((x: any)=> {
       const id = x.toNumber()
-      contract.offerMetadata(id)
+      return contract.offerMetadata(id)
     }))
+
 
     const nfts = await Promise.all(metadata.map(meta => {
       const id = meta.wantedTokenId.toNumber()
       return this.itemService.getItem(id)
     }))
 
-    return metadata.map((value, index) => {
+    const res =  metadata.map((value, index) => {
       const offer : Offer = {
-        ID: offers[index],
+        ID: offers[index].toNumber(),
         nft: nfts[index],
         amount: value.amount.toNumber(),
-        status: STATUS[value.status.toNumber()],
+        status: STATUS[value.status],
         offeringAddress: value.offeringAddress
       }
       return offer
     })
+    return res
   }
 
 
 
   async publishOffer(tokenID: number, amount: number) {
     const contract : any = new Contract(this.contractAddress, SALE_CONTRACT_ABI, this.metamask.provider?.getSigner());
-    await contract.publishOffer(tokenID, amount)
+    const tx = await contract.publishOffer(tokenID, amount)
+    await tx.wait(1)
   }
 
   async cancelOffer(offerId: number) {
     const contract : any = new Contract(this.contractAddress, SALE_CONTRACT_ABI, this.metamask.provider?.getSigner());
-    await contract.cancelOffer(offerId)
+    const tx = await contract.cancelOffer(offerId)
+    await tx.wait(1)
   }
 
   async acceptOffer(offerId: number) {
     const contract : any = new Contract(this.contractAddress, SALE_CONTRACT_ABI, this.metamask.provider?.getSigner());
-    await contract.acceptOffer(offerId)
+    const tx = await contract.acceptOffer(offerId)
+    await tx.wait(1)
   }
 
   async rejectOffer(offerId: number) {
     const contract : any = new Contract(this.contractAddress, SALE_CONTRACT_ABI, this.metamask.provider?.getSigner());
-    await contract.rejectOffer(offerId)
+    const tx = await contract.rejectOffer(offerId)
+    await tx.wait(1)
   }
 }

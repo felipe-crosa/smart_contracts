@@ -21,6 +21,7 @@ export class ReceivedOffersComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
       await this.loadCoins()
+      await this.loadOffers()
   }
 
   async loadCoins(){
@@ -32,6 +33,7 @@ export class ReceivedOffersComponent implements OnInit {
   }
 
   async showOffer(offer: Offer) {
+    console.log(offer)
     this.selectedOffer = offer
     this.showOfferModal = true
   }
