@@ -42,6 +42,7 @@ export class ReceivedOffersComponent implements OnInit {
     this.showOfferModal = false
     if(update) {
       await this.loadOffers()
+      await this.loadCoins()
     }
   }
 

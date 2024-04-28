@@ -27,7 +27,7 @@ export class ItemService {
 
     const items = finishedMetadata.map((value, index) => {
       const item : NFT = {
-        ID: index, 
+        ID: index+1, 
         owner: finishedOwners[index], 
         creator: value.creator, 
         name: value.name, 
@@ -36,7 +36,7 @@ export class ItemService {
       }
       return item
     })
-    console.log(items)
+
     return items
 
     // return [{"name":"Monkey123", "amountOfOwners":1, imageURL: "https://yt3.googleusercontent.com/5RarOFS1Ckt2EWtOxtGLDNgbDo4dnXA4n8_9MFotaqkxGVyDiOy7fKeHgzNAubOUbrVQOvlKHQ=s900-c-k-c0x00ffffff-no-rj", owner: "123", ID:1, creator:"sfdfsg"}]
