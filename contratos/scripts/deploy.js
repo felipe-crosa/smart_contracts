@@ -15,10 +15,12 @@ async function main() {
     await systemContract.addContract("items", itemContract.address)
     await systemContract.addContract("sales", saleContract.address)
 
-    await Promise.all([
-        itemContract.setMintingPrice(5),
+    const [a,b] = await Promise.all([
+        itemContract.setMintingPrice(1),
         coinContract.setPrice(1),
     ])
+    await b.wait(1)
+    await coinContract.mint(100, "0x0b7c3a4ddedd542f76ebaed43149b336107285e2", { value: 100 })
 
     console.log("SystemContract", systemContract.address);
     console.log("CoinContract:", coinContract.address);
