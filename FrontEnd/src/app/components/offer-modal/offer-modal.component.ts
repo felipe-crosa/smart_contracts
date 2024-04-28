@@ -36,7 +36,7 @@ export class OfferModalComponent implements OnInit {
 
   ngOnInit(): void {
     this.waiting = this.offer.status == Status.Waiting
-    this.isSender = this.offer.offeringAddress == this.metamaskService.walletAddress
+    this.isSender = this.offer.offeringAddress.toLowerCase() == this.metamaskService.walletAddress?.toLowerCase()
   }
   
   async acceptOffer(){
