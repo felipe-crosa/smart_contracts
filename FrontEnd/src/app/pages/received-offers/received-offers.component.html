@@ -1,0 +1,24 @@
+<div class="min-h-screen h-full w-full bg-slate-100 flex flex-col">
+    <app-navbar (bought)="loadCoins()" [coins]="coins"></app-navbar>
+    <div class="flex items-center justify-start flex-wrap w-fill space-y-2 mt-8 mx-auto px-10">
+      <div *ngFor="let offer of offers"  class="w-80 mr-4 flex flex-col">
+        <div class="h-60 w-full bg-white rounded-t-lg overflow-hidden">
+          <img 
+            [src]="offer.nft.imageURL"
+            class="w-fit overflow-hidden" 
+          />
+        </div>
+        <div class="w-full h-16 bg-purple-700 flex justify-between">
+            <span class="mx-auto my-auto text-white font-semibold">{{offer.amount}} coins</span>
+            <span class="mx-auto my-auto text-white font-semibold uppercase">{{offer.status}}</span>
+        </div>
+        <button (click)="showOffer(offer)" class="w-full h-16 bg-blue-500 rounded-b-lg flex flex-col">
+          <span class="mx-auto my-auto text-white font-semibold">{{offer.nft.name}}</span>
+        </button>
+      </div>
+      
+      
+    </div>
+  </div>
+  <app-offer-modal (close)="closeOffer($event)" *ngIf="showOfferModal && !!selectedOffer" [offer]="selectedOffer"></app-offer-modal>
+  
